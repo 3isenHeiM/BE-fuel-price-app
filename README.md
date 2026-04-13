@@ -77,24 +77,11 @@ This project is configured for GitHub Pages at:
 
 `https://3isenHeiM.github.io/BE-fuel-price-app`
 
-This project now uses the `gh-pages` React deployment flow:
-
-- `homepage` is set in [`package.json`](./package.json)
-- `predeploy` runs the React production build
-- `deploy` publishes `build/` to the `gh-pages` branch
-
-Useful commands:
-
-```bash
-npm install
-npm run deploy
-```
-
 The workflow file [`.github/workflows/deploy-pages.yml`](./.github/workflows/deploy-pages.yml):
 
 - deploys automatically on each push to `main`
 - can be launched manually from the Actions tab
-- runs every day at `12:15 UTC` to refresh the heating-oil history and redeploy the React app to the `gh-pages` branch
+- runs every day at `12:15 UTC` to refresh the heating-oil history and redeploy the React app
 
 Schedule note:
 
@@ -105,14 +92,13 @@ To enable it on GitHub:
 
 1. Push the repository to GitHub.
 2. In GitHub, open `Settings` -> `Pages`.
-3. Set `Source` to `Deploy from a branch`.
-4. Select branch `gh-pages` and folder `/ (root)`.
-5. Let the first workflow run complete.
+3. Set `Source` to `GitHub Actions`.
+4. Let the first workflow run complete.
 
 Important note:
 
 - GitHub Pages is static hosting, so the website itself does not run a server 24/7.
-- The daily refresh happens through GitHub Actions, which rebuilds the site and republishes the `build/` output.
+- The daily refresh happens through GitHub Actions, which rebuilds the site and deploys the React `build/` output directly to GitHub Pages.
 
 ## ⏰ Daily Server Sync
 
