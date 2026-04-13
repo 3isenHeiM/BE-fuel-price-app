@@ -4,8 +4,6 @@ import FuelPriceChart from './components/FuelPriceChart';
 import SeasonalityPanel from './components/SeasonalityPanel';
 import {
   fetchHeatingOilPriceData,
-  getHeatingOilInfo,
-  getOfficialSources,
 } from './services/fuelPriceService';
 
 const priceFormatter = new Intl.NumberFormat('fr-BE', {
@@ -26,14 +24,6 @@ const dateFormatter = new Intl.DateTimeFormat('fr-BE', {
   year: 'numeric',
 });
 
-const dateTimeFormatter = new Intl.DateTimeFormat('fr-BE', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
 const formatEuroPerLiter = (value) => `${priceFormatter.format(value)} EUR/L`;
 
 const formatSignedEuroPerLiter = (value) =>
@@ -42,8 +32,6 @@ const formatSignedEuroPerLiter = (value) =>
 const formatSignedPercent = (value) => `${value > 0 ? '+' : ''}${percentFormatter.format(value)}%`;
 
 const formatDate = (timestamp) => dateFormatter.format(new Date(timestamp));
-
-const formatDateTime = (value) => dateTimeFormatter.format(new Date(value));
 
 const getChangeTone = (value) => {
   if (value > 0) {
@@ -73,9 +61,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
-
-  const officialSources = getOfficialSources();
-  const heatingOilInfo = getHeatingOilInfo();
 
   const loadDashboardData = async (forceRefresh = false) => {
     try {
@@ -116,11 +101,10 @@ function App() {
         <header className="hero">
           <div className="hero-copy">
             <span className="eyebrow">Belgian heating oil tracker</span>
-            <h1>Daily house fuel pricing with full historical storage.</h1>
+            <h1>Buy at the better moment.</h1>
             <p className="hero-text">
-              This webapp reads a full local copy of the Belgian residential heating oil curve,
-              synced from mazout.com and stored in this project, then graphs every published
-              point dynamically.
+              Daily price, full history, and a weekly seasonal comparison to help time your next
+              order.
             </p>
 
             <div className="hero-meta">
@@ -153,7 +137,7 @@ function App() {
             {isLoading && !dashboardData ? (
               <div className="loading-state">
                 <div className="spinner" />
-                <p>Loading the local Belgian heating oil history file...</p>
+                <p>Loading local history...</p>
               </div>
             ) : null}
 
@@ -224,10 +208,9 @@ function App() {
               <div className="section-head">
                 <div>
                   <span className="section-kicker">History</span>
-                  <h2>Every chart point, fetched and graphed dynamically.</h2>
+                  <h2>Price history</h2>
                   <p>
-                    Series tracked: {metadata.seriesName}. Coverage runs from{' '}
-                    {formatDate(metadata.firstPublishedAt)} to {formatDate(metadata.lastPublishedAt)}.
+                    {formatDate(metadata.firstPublishedAt)} to {formatDate(metadata.lastPublishedAt)}
                   </p>
                 </div>
               </div>
@@ -244,59 +227,14 @@ function App() {
               <div className="section-head">
                 <div>
                   <span className="section-kicker">Seasonality</span>
-                  <h2>Jan-Dec comparison to help time your purchase.</h2>
+                  <h2>Jan-Dec weekly comparison</h2>
                   <p>
-                    This panel overlays every stored year as a monthly line so you can see when
-                    prices tend to soften during the year, even without trying to predict the
-                    future.
+                    One line per year, grouped by week.
                   </p>
                 </div>
               </div>
 
               <SeasonalityPanel historicalData={dashboardData.historicalData} />
-            </section>
-
-            <section className="details-grid">
-              <article className="surface-card detail-card">
-                <span className="section-kicker">Storage</span>
-                <h3>Local project dataset</h3>
-                <p>{heatingOilInfo.frequency}</p>
-                {metadata?.syncedAt ? (
-                  <p className="detail-meta">Last sync time: {formatDateTime(metadata.syncedAt)}</p>
-                ) : null}
-                {metadata?.localDatasetPath ? (
-                  <p className="detail-meta">File path: {metadata.localDatasetPath}</p>
-                ) : null}
-              </article>
-
-              <article className="surface-card detail-card">
-                <span className="section-kicker">Source</span>
-                <h3>Where the data comes from</h3>
-                <p>{heatingOilInfo.description}</p>
-                <p className="detail-meta">
-                  Local snapshot:{' '}
-                  <a href={officialSources.local.url} rel="noreferrer" target="_blank">
-                    {officialSources.local.name}
-                  </a>
-                </p>
-                <p className="detail-meta">
-                  Page source:{' '}
-                  <a href={officialSources.history.url} rel="noreferrer" target="_blank">
-                    {officialSources.history.name}
-                  </a>
-                </p>
-                <p className="detail-meta">API path: {metadata.historyApiPath}</p>
-              </article>
-
-              <article className="surface-card detail-card">
-                <span className="section-kicker">Usage</span>
-                <h3>What the app shows</h3>
-                <p>{heatingOilInfo.usage}</p>
-                <p className="detail-meta">Series label: {currentPrice?.seriesName}</p>
-                <p className="detail-meta">
-                  History points available: {integerFormatter.format(metadata.totalPoints)}
-                </p>
-              </article>
             </section>
           </>
         ) : null}
