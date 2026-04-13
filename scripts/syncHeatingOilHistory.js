@@ -157,7 +157,14 @@ const syncHeatingOilHistory = async () => {
   );
 };
 
-syncHeatingOilHistory().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+module.exports = {
+  DATA_FILE_PATH,
+  syncHeatingOilHistory,
+};
+
+if (require.main === module) {
+  syncHeatingOilHistory().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}

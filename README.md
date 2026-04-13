@@ -71,6 +71,42 @@ npm run build
 
 The optimized production files will be created in the `build` folder.
 
+## ⏰ Daily Server Sync
+
+React itself does not run scheduled jobs on the server. The frontend only reads the local JSON file.
+If you want the server to poll once per day and update the history file automatically, run the
+server-side scheduler:
+
+```bash
+npm run sync:history:daily
+```
+
+This starts a small Node process that:
+
+- optionally syncs immediately on startup
+- refreshes `public/data/heating-oil-history.json` every day
+- keeps the website reading the updated local file
+
+Optional environment variables:
+
+```bash
+HISTORY_SYNC_HOUR=6
+HISTORY_SYNC_MINUTE=15
+HISTORY_SYNC_IMMEDIATE=true
+```
+
+Example with a server process manager:
+
+```bash
+HISTORY_SYNC_HOUR=6 HISTORY_SYNC_MINUTE=15 npm run sync:history:daily
+```
+
+If you prefer classic server cron instead of a long-running Node process, you can also schedule:
+
+```bash
+npm run sync:history
+```
+
 ## 📁 File Structure
 
 ```

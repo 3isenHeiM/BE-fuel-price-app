@@ -20,6 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "sync:history": "node scripts/syncHeatingOilHistory.js",
+    "sync:history:daily": "node scripts/dailyHistoryServer.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
