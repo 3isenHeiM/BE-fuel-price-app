@@ -24,10 +24,10 @@ const dateFormatter = new Intl.DateTimeFormat('fr-BE', {
   year: 'numeric',
 });
 
-const formatEuroPerLiter = (value) => `${priceFormatter.format(value)} EUR/L`;
+const formatEuroPerLiter = (value) => `${priceFormatter.format(value)} €/L`;
 
 const formatSignedEuroPerLiter = (value) =>
-  `${value > 0 ? '+' : ''}${priceFormatter.format(value)} EUR/L`;
+  `${value > 0 ? '+' : ''}${priceFormatter.format(value)} €/L`;
 
 const formatSignedPercent = (value) => `${value > 0 ? '+' : ''}${percentFormatter.format(value)}%`;
 

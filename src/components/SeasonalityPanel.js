@@ -76,10 +76,10 @@ const buildWeekAxisLabels = () => {
   return labels;
 };
 
-const formatEuroPerLiter = (value) => `${priceFormatter.format(value)} EUR/L`;
+const formatEuroPerLiter = (value) => `${priceFormatter.format(value)} €/L`;
 
 const formatSignedEuroPerLiter = (value) =>
-  `${value > 0 ? '+' : ''}${priceFormatter.format(value)} EUR/L`;
+  `${value > 0 ? '+' : ''}${priceFormatter.format(value)} €/L`;
 
 const formatSignedPercent = (value) => `${value > 0 ? '+' : ''}${percentFormatter.format(value)}%`;
 
@@ -258,7 +258,7 @@ const SeasonalityPanel = ({ historicalData }) => {
               return `${context.dataset.label}: no data`;
             }
 
-            return `${context.dataset.label}: ${priceFormatter.format(context.parsed.y)} EUR/L`;
+            return `${context.dataset.label}: ${priceFormatter.format(context.parsed.y)} €/L`;
           },
         },
       },
@@ -270,7 +270,7 @@ const SeasonalityPanel = ({ historicalData }) => {
           color: 'rgba(15, 23, 42, 0.08)',
         },
         ticks: {
-          callback: (value) => `${priceFormatter.format(value)} EUR`,
+          callback: (value) => `${priceFormatter.format(value)} €`,
         },
         title: {
           display: true,

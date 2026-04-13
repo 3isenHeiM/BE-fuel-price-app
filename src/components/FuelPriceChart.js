@@ -123,7 +123,7 @@ const FuelPriceChart = ({ historicalData, isLoading, error, seriesName }) => {
             const point = filteredHistory[tooltipItems[0]?.dataIndex];
             return point ? tooltipDateFormatter.format(new Date(point.timestamp)) : '';
           },
-          label: (context) => `${priceFormatter.format(context.parsed.y)} EUR/L`,
+          label: (context) => `${priceFormatter.format(context.parsed.y)} €/L`,
         },
       },
     },
@@ -134,7 +134,7 @@ const FuelPriceChart = ({ historicalData, isLoading, error, seriesName }) => {
           color: 'rgba(15, 23, 42, 0.08)',
         },
         ticks: {
-          callback: (value) => `${priceFormatter.format(value)} EUR`,
+          callback: (value) => `${priceFormatter.format(value)} €`,
         },
         title: {
           display: true,

@@ -62,7 +62,7 @@ test('renders the live price summary and history section', async () => {
   render(<App />);
 
   expect(await screen.findByText(/buy at the better moment/i)).toBeInTheDocument();
-  expect(await screen.findAllByText(/1,4556 EUR\/L/i)).toHaveLength(2);
+  expect(await screen.findAllByText(/1,4556 €\/L/i)).toHaveLength(2);
   expect(screen.getByText(/price history/i)).toBeInTheDocument();
   expect(screen.getByText(/jan-dec weekly comparison/i)).toBeInTheDocument();
   expect(screen.getByText(/history chart/i)).toBeInTheDocument();
