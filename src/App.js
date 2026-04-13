@@ -1,6 +1,7 @@
 import React, { startTransition, useEffect, useState } from 'react';
 import './App.css';
 import FuelPriceChart from './components/FuelPriceChart';
+import SeasonalityPanel from './components/SeasonalityPanel';
 import {
   fetchHeatingOilPriceData,
   getHeatingOilInfo,
@@ -237,6 +238,22 @@ function App() {
                 error={error && !dashboardData ? error : null}
                 seriesName={metadata.seriesName}
               />
+            </section>
+
+            <section className="surface-card section-card">
+              <div className="section-head">
+                <div>
+                  <span className="section-kicker">Seasonality</span>
+                  <h2>Jan-Dec comparison to help time your purchase.</h2>
+                  <p>
+                    This panel overlays every stored year as a monthly line so you can see when
+                    prices tend to soften during the year, even without trying to predict the
+                    future.
+                  </p>
+                </div>
+              </div>
+
+              <SeasonalityPanel historicalData={dashboardData.historicalData} />
             </section>
 
             <section className="details-grid">

@@ -3,6 +3,7 @@ import App from './App';
 import { fetchHeatingOilPriceData } from './services/fuelPriceService';
 
 jest.mock('./components/FuelPriceChart', () => () => <div>History chart</div>);
+jest.mock('./components/SeasonalityPanel', () => () => <div>Seasonality panel</div>);
 
 jest.mock('./services/fuelPriceService', () => ({
   fetchHeatingOilPriceData: jest.fn(),
@@ -63,5 +64,7 @@ test('renders the live price summary and history section', async () => {
   expect(await screen.findByText(/daily house fuel pricing/i)).toBeInTheDocument();
   expect(await screen.findAllByText(/1,4556 EUR\/L/i)).toHaveLength(2);
   expect(screen.getByText(/every chart point, fetched and graphed dynamically/i)).toBeInTheDocument();
+  expect(screen.getByText(/jan-dec comparison to help time your purchase/i)).toBeInTheDocument();
   expect(screen.getByText(/history chart/i)).toBeInTheDocument();
+  expect(screen.getByText(/seasonality panel/i)).toBeInTheDocument();
 });

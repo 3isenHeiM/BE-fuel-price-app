@@ -343,6 +343,57 @@
   height: 460px;
 }
 
+.seasonality-panel {
+  position: relative;
+  z-index: 1;
+}
+
+.seasonality-insights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.seasonality-insight {
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.seasonality-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.seasonality-insight strong {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--heading-font);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.seasonality-insight p,
+.seasonality-summary {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.seasonality-summary {
+  margin-bottom: 18px;
+}
+
+.seasonality-chart-canvas {
+  height: 460px;
+}
+
 .details-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -405,7 +456,8 @@
 @media (max-width: 1080px) {
   .hero,
   .summary-grid,
-  .details-grid {
+  .details-grid,
+  .seasonality-insights {
     grid-template-columns: 1fr;
   }
 
@@ -433,5 +485,9 @@
 
   .chart-canvas {
     height: 360px;
+  }
+
+  .seasonality-chart-canvas {
+    height: 380px;
   }
 }
