@@ -350,7 +350,7 @@
 
 .seasonality-insights {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
   margin-bottom: 18px;
 }
@@ -359,6 +359,16 @@
   padding: 18px;
   border-radius: 22px;
   background: rgba(15, 23, 42, 0.04);
+}
+
+.seasonality-insight-positive strong,
+.seasonality-insight-positive p:last-child {
+  color: var(--positive);
+}
+
+.seasonality-insight-negative strong,
+.seasonality-insight-negative p:last-child {
+  color: var(--negative);
 }
 
 .seasonality-label {

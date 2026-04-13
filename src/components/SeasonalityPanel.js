@@ -24,9 +24,20 @@ const priceFormatter = new Intl.NumberFormat('fr-BE', {
   maximumFractionDigits: 4,
 });
 
+const percentFormatter = new Intl.NumberFormat('fr-BE', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 const tooltipDateFormatter = new Intl.DateTimeFormat('fr-BE', {
   day: '2-digit',
   month: 'short',
+});
+
+const publishedDateFormatter = new Intl.DateTimeFormat('fr-BE', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
 });
 
 const average = (values) => values.reduce((sum, value) => sum + value, 0) / values.length;
@@ -65,7 +76,36 @@ const buildWeekAxisLabels = () => {
   return labels;
 };
 
-const getSeasonalityModel = (historicalData) => {
+const formatEuroPerLiter = (value) => `${priceFormatter.format(value)} EUR/L`;
+
+const formatSignedEuroPerLiter = (value) =>
+  `${value > 0 ? '+' : ''}${priceFormatter.format(value)} EUR/L`;
+
+const formatSignedPercent = (value) => `${value > 0 ? '+' : ''}${percentFormatter.format(value)}%`;
+
+const getChangeTone = (value) => {
+  if (value > 0) {
+    return 'positive';
+  }
+
+  if (value < 0) {
+    return 'negative';
+  }
+
+  return 'neutral';
+};
+
+const findClosestAverageWeek = (averageWeeklyTrend, targetWeekIndex) =>
+  averageWeeklyTrend
+    .map((value, index) => ({
+      value,
+      index,
+      distance: Math.abs(index - targetWeekIndex),
+    }))
+    .filter((item) => item.value !== null)
+    .sort((left, right) => left.distance - right.distance || left.index - right.index)[0] ?? null;
+
+export const getSeasonalityModel = (historicalData) => {
   const yearBuckets = new Map();
   const allYearsByWeek = buildWeekBuckets();
 
@@ -146,6 +186,28 @@ const getSeasonalityModel = (historicalData) => {
     null,
   );
 
+  const latestPoint = historicalData[historicalData.length - 1];
+  const latestWeekIndex = getWeekBucketIndex(latestPoint.timestamp);
+  const closestAverageWeek = findClosestAverageWeek(averageWeeklyTrend, latestWeekIndex);
+  const latestDelta = closestAverageWeek
+    ? latestPoint.price - closestAverageWeek.value
+    : null;
+  const latestDeltaPercent = closestAverageWeek?.value
+    ? (latestDelta / closestAverageWeek.value) * 100
+    : 0;
+  const latestVsAverage = closestAverageWeek
+    ? {
+        latestPoint,
+        latestWeekIndex,
+        averagePrice: closestAverageWeek.value,
+        averageWeekIndex: closestAverageWeek.index,
+        distanceFromLatestWeek: closestAverageWeek.distance,
+        delta: latestDelta,
+        deltaPercent: latestDeltaPercent,
+        tone: getChangeTone(latestDelta),
+      }
+    : null;
+
   return {
     axisLabels: buildWeekAxisLabels(),
     datasets,
@@ -153,6 +215,7 @@ const getSeasonalityModel = (historicalData) => {
     bestWeek,
     worstWeek,
     bestWindow,
+    latestVsAverage,
   };
 };
 
@@ -232,6 +295,35 @@ const SeasonalityPanel = ({ historicalData }) => {
   return (
     <div className="seasonality-panel">
       <div className="seasonality-insights">
+        {seasonalityModel.latestVsAverage ? (
+          <article
+            className={`seasonality-insight seasonality-insight-${seasonalityModel.latestVsAverage.tone}`}
+          >
+            <span className="seasonality-label">Today vs average week</span>
+            <strong>{formatSignedEuroPerLiter(seasonalityModel.latestVsAverage.delta)}</strong>
+            <p>
+              Latest published price {formatEuroPerLiter(seasonalityModel.latestVsAverage.latestPoint.price)} on{' '}
+              {publishedDateFormatter.format(
+                new Date(seasonalityModel.latestVsAverage.latestPoint.timestamp),
+              )}{' '}
+              versus the all-years weekly average of{' '}
+              {formatEuroPerLiter(seasonalityModel.latestVsAverage.averagePrice)} for{' '}
+              {getWeekRangeLabel(seasonalityModel.latestVsAverage.averageWeekIndex).replace(
+                'Week of ',
+                '',
+              )}
+              {seasonalityModel.latestVsAverage.distanceFromLatestWeek > 0
+                ? ' (nearest available average bucket)'
+                : ''}
+              .
+            </p>
+            <p>
+              {formatSignedPercent(seasonalityModel.latestVsAverage.deltaPercent)} against the
+              closest average point in the seasonal curve.
+            </p>
+          </article>
+        ) : null}
+
         <article className="seasonality-insight">
           <span className="seasonality-label">Best week historically</span>
           <strong>{getWeekRangeLabel(seasonalityModel.bestWeek.index).replace('Week of ', '')}</strong>
