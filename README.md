@@ -71,6 +71,35 @@ npm run build
 
 The optimized production files will be created in the `build` folder.
 
+## 🌐 GitHub Pages Deployment
+
+This project is configured for GitHub Pages at:
+
+`https://3isenHeiM.github.io/BE-fuel-price-app`
+
+The workflow file [`.github/workflows/deploy-pages.yml`](./.github/workflows/deploy-pages.yml):
+
+- deploys automatically on each push to `main`
+- can be launched manually from the Actions tab
+- runs every day at `12:15 UTC` to refresh the heating-oil history and redeploy the site
+
+Schedule note:
+
+- `12:15 UTC` corresponds to `13:15` in Belgium during winter time and `14:15` during summer time
+- this gives the workflow more margin to catch the latest official daily publication before rebuilding the site
+
+To enable it on GitHub:
+
+1. Push the repository to GitHub.
+2. In GitHub, open `Settings` -> `Pages`.
+3. Set `Source` to `GitHub Actions`.
+4. Let the first workflow run complete.
+
+Important note:
+
+- GitHub Pages is static hosting, so the website itself does not run a server 24/7.
+- The daily refresh happens through GitHub Actions, which rebuilds the site with the latest synchronized JSON data.
+
 ## ⏰ Daily Server Sync
 
 React itself does not run scheduled jobs on the server. The frontend only reads the local JSON file.
