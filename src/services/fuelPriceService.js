@@ -30,11 +30,12 @@ const writeStoredSnapshot = (snapshot) => {
   }
 };
 
-const withCacheStatus = (snapshot, cacheStatus, syncMessage) => ({
+const withCacheStatus = (snapshot, cacheStatus, syncMessageKey, syncMessage) => ({
   ...snapshot,
   metadata: {
     ...snapshot.metadata,
     cacheStatus,
+    syncMessageKey,
     syncMessage,
   },
 });
@@ -58,6 +59,7 @@ export const fetchHeatingOilPriceData = async (options = {}) => {
     const nextSnapshot = withCacheStatus(
       response.data,
       'local-file',
+      'localFileLoaded',
       'Loaded from the local history file in this project.',
     );
 
@@ -70,13 +72,16 @@ export const fetchHeatingOilPriceData = async (options = {}) => {
       return withCacheStatus(
         storedSnapshot,
         'stale',
+        'browserFallback',
         'The local JSON file could not be read, so the app fell back to the last browser copy.',
       );
     }
 
-    throw new Error(
+    const readError = new Error(
       'Unable to read the local heating oil history file. Run `npm run sync:history` to generate it.',
     );
+    readError.code = 'localHistoryReadFailed';
+    throw readError;
   }
 };
 

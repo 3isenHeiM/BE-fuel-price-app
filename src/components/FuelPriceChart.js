@@ -11,32 +11,16 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
+import { formatMessage, getLocale, getMessages } from '../i18n';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const RANGE_OPTIONS = [
-  { id: '1M', label: '1 month', days: 31 },
-  { id: '6M', label: '6 months', days: 183 },
-  { id: '1Y', label: '1 year', days: 366 },
-  { id: 'ALL', label: 'All', days: null },
+  { id: '1M', days: 31 },
+  { id: '6M', days: 183 },
+  { id: '1Y', days: 366 },
+  { id: 'ALL', days: null },
 ];
-
-const axisDateFormatter = new Intl.DateTimeFormat('fr-BE', {
-  day: '2-digit',
-  month: '2-digit',
-  year: '2-digit',
-});
-
-const tooltipDateFormatter = new Intl.DateTimeFormat('fr-BE', {
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric',
-});
-
-const priceFormatter = new Intl.NumberFormat('fr-BE', {
-  minimumFractionDigits: 4,
-  maximumFractionDigits: 4,
-});
 
 const filterHistoryByRange = (historicalData, selectedRange) => {
   if (!historicalData.length || selectedRange === 'ALL') {
@@ -56,16 +40,42 @@ const filterHistoryByRange = (historicalData, selectedRange) => {
   return filteredData.length ? filteredData : historicalData;
 };
 
-const FuelPriceChart = ({ historicalData, isLoading, error, seriesName }) => {
+const FuelPriceChart = ({
+  historicalData,
+  isLoading,
+  error,
+  language = 'en',
+  pricePrecision = 2,
+  seriesName,
+}) => {
   const [selectedRange, setSelectedRange] = useState('1Y');
   const deferredHistoricalData = useDeferredValue(historicalData);
   const filteredHistory = filterHistoryByRange(deferredHistoricalData, selectedRange);
+  const locale = getLocale(language);
+  const messages = getMessages(language);
+
+  const axisDateFormatter = new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+  });
+
+  const tooltipDateFormatter = new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  const priceFormatter = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: pricePrecision,
+    maximumFractionDigits: pricePrecision,
+  });
 
   if (isLoading) {
     return (
       <div className="chart-state">
         <div className="spinner" />
-        <p>Preparing the historical price chart...</p>
+        <p>{messages.chart.preparing}</p>
       </div>
     );
   }
@@ -81,7 +91,7 @@ const FuelPriceChart = ({ historicalData, isLoading, error, seriesName }) => {
   if (!filteredHistory.length) {
     return (
       <div className="chart-state">
-        <p>No history points are available yet.</p>
+        <p>{messages.chart.empty}</p>
       </div>
     );
   }
@@ -138,7 +148,7 @@ const FuelPriceChart = ({ historicalData, isLoading, error, seriesName }) => {
         },
         title: {
           display: true,
-          text: 'Price per liter',
+          text: messages.chart.yAxisTitle,
         },
       },
       x: {
@@ -156,7 +166,7 @@ const FuelPriceChart = ({ historicalData, isLoading, error, seriesName }) => {
   return (
     <div className="chart-card">
       <div className="chart-toolbar">
-        <div className="range-switcher" aria-label="History range">
+        <div className="range-switcher" aria-label={messages.chart.historyRange}>
           {RANGE_OPTIONS.map((option) => (
             <button
               aria-pressed={selectedRange === option.id}
@@ -165,15 +175,17 @@ const FuelPriceChart = ({ historicalData, isLoading, error, seriesName }) => {
               onClick={() => setSelectedRange(option.id)}
               type="button"
             >
-              {option.label}
+              {messages.chart.ranges[option.id]}
             </button>
           ))}
         </div>
 
         <p className="chart-caption">
-          Showing {filteredHistory.length} points from{' '}
-          {tooltipDateFormatter.format(new Date(filteredHistory[0].timestamp))} to{' '}
-          {tooltipDateFormatter.format(new Date(filteredHistory[filteredHistory.length - 1].timestamp))}
+          {formatMessage(messages.chart.showingRange, {
+            count: filteredHistory.length,
+            from: tooltipDateFormatter.format(new Date(filteredHistory[0].timestamp)),
+            to: tooltipDateFormatter.format(new Date(filteredHistory[filteredHistory.length - 1].timestamp)),
+          })}
         </p>
       </div>
 

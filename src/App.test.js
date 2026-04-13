@@ -1,34 +1,20 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 import { fetchHeatingOilPriceData } from './services/fuelPriceService';
 
-jest.mock('./components/FuelPriceChart', () => () => <div>History chart</div>);
-jest.mock('./components/SeasonalityPanel', () => () => <div>Seasonality panel</div>);
+jest.mock('./components/FuelPriceChart', () => ({ language, pricePrecision }) => (
+  <div>{`History chart ${language} ${pricePrecision}`}</div>
+));
+
+jest.mock('./components/SeasonalityPanel', () => ({ language, pricePrecision }) => (
+  <div>{`Seasonality panel ${language} ${pricePrecision}`}</div>
+));
 
 jest.mock('./services/fuelPriceService', () => ({
   fetchHeatingOilPriceData: jest.fn(),
-  getHeatingOilInfo: () => ({
-    description: 'Heating oil description',
-    usage: 'Heating oil usage',
-    frequency: 'Stored in public/data/heating-oil-history.json.',
-  }),
-  getOfficialSources: () => ({
-    local: {
-      name: 'Local history snapshot',
-      url: '/data/heating-oil-history.json',
-    },
-    history: {
-      name: 'Mazout history',
-      url: 'https://example.com/history',
-    },
-    api: {
-      name: 'Mazout API',
-      url: 'https://example.com/api',
-    },
-  }),
 }));
 
-test('renders the live price summary and history section', async () => {
+test('renders the dashboard in english by default and lets the user change language and price precision', async () => {
   fetchHeatingOilPriceData.mockResolvedValue({
     currentPrice: {
       price: 1.4556,
@@ -40,8 +26,21 @@ test('renders the live price summary and history section', async () => {
       seriesName: 'Mazout de chauffage extra - de 2 000 L',
     },
     summary: [
-      { id: 'latest', label: 'Latest published price', value: 1.4556, caption: 'Current', kind: 'price' },
-      { id: 'week', label: '1 week change', value: -0.1912, percentChange: -11.61, caption: 'Difference versus one week ago', kind: 'delta' },
+      {
+        id: 'latest',
+        label: 'Latest published price',
+        value: 1.4556,
+        caption: 'Current',
+        kind: 'price',
+      },
+      {
+        id: 'week',
+        label: '1 week change',
+        value: -0.1912,
+        percentChange: -11.61,
+        caption: 'Difference versus one week ago',
+        kind: 'delta',
+      },
     ],
     historicalData: [
       { timestamp: Date.UTC(2026, 3, 9), price: 1.317 },
@@ -56,15 +55,28 @@ test('renders the live price summary and history section', async () => {
       seriesName: 'Mazout de chauffage extra - de 2 000 L',
       historyApiPath: 'https://api.example.com/price-history',
       localDatasetPath: '/data/heating-oil-history.json',
+      syncMessageKey: 'localFileLoaded',
     },
   });
 
   render(<App />);
 
   expect(await screen.findByText(/buy at the better moment/i)).toBeInTheDocument();
-  expect(await screen.findAllByText(/1,4556 €\/L/i)).toHaveLength(2);
-  expect(screen.getByText(/price history/i)).toBeInTheDocument();
-  expect(screen.getByText(/jan-dec weekly comparison/i)).toBeInTheDocument();
-  expect(screen.getByText(/history chart/i)).toBeInTheDocument();
-  expect(screen.getByText(/seasonality panel/i)).toBeInTheDocument();
+  expect(await screen.findAllByText('1.46 €/L')).toHaveLength(2);
+  expect(screen.getByText('History chart en 2')).toBeInTheDocument();
+  expect(screen.getByText('Seasonality panel en 2')).toBeInTheDocument();
+
+  const languageSelect = screen.getByLabelText(/language/i);
+  const precisionSelect = screen.getByLabelText(/price decimals/i);
+
+  expect(languageSelect).toHaveValue('en');
+  expect(precisionSelect).toHaveValue('2');
+
+  fireEvent.change(languageSelect, { target: { value: 'fr' } });
+  fireEvent.change(precisionSelect, { target: { value: '4' } });
+
+  expect(await screen.findByText(/acheter au meilleur moment/i)).toBeInTheDocument();
+  expect(await screen.findAllByText('1,4556 €/L')).toHaveLength(2);
+  expect(screen.getByText('History chart fr 4')).toBeInTheDocument();
+  expect(screen.getByText('Seasonality panel fr 4')).toBeInTheDocument();
 });

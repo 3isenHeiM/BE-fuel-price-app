@@ -32,10 +32,10 @@ test('renders the delta between the latest price and the closest average week', 
     buildPoint(2026, 1, 6, 1.4),
   ];
 
-  render(<SeasonalityPanel historicalData={historicalData} />);
+  render(<SeasonalityPanel historicalData={historicalData} language="en" pricePrecision={4} />);
 
   expect(screen.getByText(/today vs average week/i)).toBeInTheDocument();
-  expect(screen.getByText('+0,2000 €/L')).toBeInTheDocument();
-  expect(screen.getByText(/\+16,67% against the closest average point/i)).toBeInTheDocument();
-  expect(screen.getByText(/latest published price 1,4000 €\/L/i)).toBeInTheDocument();
+  expect(screen.getByText('+0.2000 €/L')).toBeInTheDocument();
+  expect(screen.getByText(/\+16.67% against the closest average point/i)).toBeInTheDocument();
+  expect(screen.getByText(/latest published price 1.4000 €\/L/i)).toBeInTheDocument();
 });
