@@ -58,9 +58,6 @@ const getChangeTone = (value) => {
   return 'neutral';
 };
 
-const getStorageBadgeLabel = (cacheStatus, messages) =>
-  messages.storageBadge[cacheStatus] ?? messages.storageBadge.loading;
-
 const getSummaryCopy = (item, messages) => messages.summary[item.id] ?? {
   label: item.label,
   caption: item.caption,
@@ -92,8 +89,6 @@ function App() {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-
-  const integerFormatter = new Intl.NumberFormat(locale);
 
   const dateFormatter = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
@@ -164,7 +159,30 @@ function App() {
             <h1>{messages.hero.title}</h1>
             <p className="hero-text">{messages.hero.text}</p>
 
-            <div className="hero-controls" aria-label={messages.controls.preferences}>
+            <div className="hero-meta">
+              {metadata?.lastPublishedAt ? (
+                <span className="badge">
+                  {formatMessage(messages.hero.latestPublication, {
+                    date: formatDate(metadata.lastPublishedAt),
+                  })}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="hero-actions">
+              <button
+                className="primary-button"
+                disabled={isLoading || isRefreshing}
+                onClick={() => loadDashboardData(true)}
+                type="button"
+              >
+                {isRefreshing ? messages.hero.reloading : messages.hero.reload}
+              </button>
+            </div>
+          </div>
+
+          <div className="hero-side">
+            <div className="hero-controls hero-controls-panel" aria-label={messages.controls.preferences}>
               <label className="control-field">
                 <span className="control-label">{messages.controls.language}</span>
                 <select
@@ -196,80 +214,49 @@ function App() {
               </label>
             </div>
 
-            <div className="hero-meta">
-              <span className={`badge badge-${metadata?.cacheStatus ?? 'loading'}`}>
-                {getStorageBadgeLabel(metadata?.cacheStatus, messages)}
-              </span>
-              {metadata?.totalPoints ? (
-                <span className="badge">
-                  {formatMessage(messages.hero.storedPoints, {
-                    count: integerFormatter.format(metadata.totalPoints),
-                  })}
-                </span>
-              ) : null}
-              {metadata?.lastPublishedAt ? (
-                <span className="badge">
-                  {formatMessage(messages.hero.latestPublication, {
-                    date: formatDate(metadata.lastPublishedAt),
-                  })}
-                </span>
-              ) : null}
-            </div>
-
-            <div className="hero-actions">
-              <button
-                className="primary-button"
-                disabled={isLoading || isRefreshing}
-                onClick={() => loadDashboardData(true)}
-                type="button"
-              >
-                {isRefreshing ? messages.hero.reloading : messages.hero.reload}
-              </button>
-            </div>
-          </div>
-
-          <section className="surface-card hero-panel">
-            {isLoading && !dashboardData ? (
-              <div className="loading-state">
-                <div className="spinner" />
-                <p>{messages.hero.loading}</p>
-              </div>
-            ) : null}
-
-            {currentPrice ? (
-              <div className="price-spotlight">
-                <span className="panel-label">{messages.priceSpotlight.label}</span>
-                <strong className="spotlight-value">{formatEuroPerLiter(currentPrice.price)}</strong>
-                <p className="spotlight-date">
-                  {formatMessage(messages.priceSpotlight.publishedOn, {
-                    date: formatDate(currentPrice.publishedAt),
-                  })}
-                </p>
-
-                <div className={`movement movement-${currentPriceTone}`}>
-                  <span className="movement-label">{messages.priceSpotlight.moveFromPrevious}</span>
-                  <strong>{formatSignedEuroPerLiter(currentPrice.changeFromPrevious)}</strong>
-                  <span>{formatSignedPercent(currentPrice.changePercentFromPrevious)}</span>
+            <section className="surface-card hero-panel">
+              {isLoading && !dashboardData ? (
+                <div className="loading-state">
+                  <div className="spinner" />
+                  <p>{messages.hero.loading}</p>
                 </div>
+              ) : null}
 
-                {currentPrice.previousPublishedAt ? (
-                  <p className="spotlight-footnote">
-                    {formatMessage(messages.priceSpotlight.previousPoint, {
-                      price: formatEuroPerLiter(currentPrice.previousPrice),
-                      date: formatDate(currentPrice.previousPublishedAt),
+              {currentPrice ? (
+                <div className="price-spotlight">
+                  <span className="panel-label">{messages.priceSpotlight.label}</span>
+                  <strong className="spotlight-value">{formatEuroPerLiter(currentPrice.price)}</strong>
+                  <p className="spotlight-date">
+                    {formatMessage(messages.priceSpotlight.publishedOn, {
+                      date: formatDate(currentPrice.publishedAt),
                     })}
                   </p>
-                ) : null}
-              </div>
-            ) : null}
 
-            {!isLoading && !currentPrice && error ? (
-              <div className="error-state">
-                <strong>{messages.states.loadErrorTitle}</strong>
-                <p>{translatedErrorMessage}</p>
-              </div>
-            ) : null}
-          </section>
+                  <div className={`movement movement-${currentPriceTone}`}>
+                    <span className="movement-label">{messages.priceSpotlight.moveFromPrevious}</span>
+                    <strong>{formatSignedEuroPerLiter(currentPrice.changeFromPrevious)}</strong>
+                    <span>{formatSignedPercent(currentPrice.changePercentFromPrevious)}</span>
+                  </div>
+
+                  {currentPrice.previousPublishedAt ? (
+                    <p className="spotlight-footnote">
+                      {formatMessage(messages.priceSpotlight.previousPoint, {
+                        price: formatEuroPerLiter(currentPrice.previousPrice),
+                        date: formatDate(currentPrice.previousPublishedAt),
+                      })}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {!isLoading && !currentPrice && error ? (
+                <div className="error-state">
+                  <strong>{messages.states.loadErrorTitle}</strong>
+                  <p>{translatedErrorMessage}</p>
+                </div>
+              ) : null}
+            </section>
+          </div>
         </header>
 
         {staleWarning ? (

@@ -39,6 +39,12 @@
   padding: 12px 4px;
 }
 
+.hero-side {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
 .eyebrow,
 .section-kicker {
   display: inline-flex;
@@ -90,7 +96,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-top: 22px;
+  justify-content: flex-end;
+}
+
+.hero-controls-panel {
+  justify-self: end;
 }
 
 .control-field {
@@ -514,6 +524,14 @@
 @media (max-width: 720px) {
   .App {
     padding: 20px 14px 40px;
+  }
+
+  .hero-controls {
+    justify-content: flex-start;
+  }
+
+  .hero-controls-panel {
+    justify-self: stretch;
   }
 
   .hero h1 {
