@@ -39,6 +39,8 @@ jobs:
         run: npm run sync:history
 
       - name: Build app
+        env:
+          PUBLIC_URL: /BE-fuel-price-app
         run: npm run build
 
       - name: Configure GitHub Pages

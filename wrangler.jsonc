@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4.160.1/config-schema.json",
+  "name": "be-fuel-price-app-github",
+  "pages_build_output_dir": "./build",
+  "compatibility_date": "2026-11-12"
+}
