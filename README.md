@@ -37,7 +37,7 @@ This ensures users always have access to price information, even during API outa
 
 ### Prerequisites
 
-- Node.js 22.12 or higher (Node.js 24 recommended for Cloudflare deployment)
+- Node.js 26 LTS (the version selected in `.node-version`)
 - npm
 - Internet connection (for fetching official data)
 
@@ -96,13 +96,17 @@ Actions secrets for these native deployments.
 | Build command | `npm test -- --watchAll=false --runInBand && npm run sync:history && npm run build` |
 | Build output directory | `build` |
 | Root directory | Repository root |
-| `NODE_VERSION` | `24` |
+| `NODE_VERSION` | `26` |
 | `PUBLIC_URL` | `/` |
 
 Push changes to `main` to trigger a production deployment. Other branches get
 preview deployments. Build status and logs are available in the Cloudflare
 project's **Deployments** tab. The tracked [`wrangler.jsonc`](./wrangler.jsonc)
 uses the same project name and output directory.
+
+The root [`.node-version`](./.node-version) selects Node.js 26 LTS for local
+version managers and GitHub Actions. Keep Cloudflare's `NODE_VERSION` override
+at `26` for both production and preview builds so it matches the repository.
 
 The original [Direct Upload site](https://be-fuel-price-app.pages.dev/) remains
 available as the earlier deployment. Cloudflare does not support converting a

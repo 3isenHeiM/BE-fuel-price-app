@@ -34,7 +34,7 @@ computer, or server process is needed for each refresh.
    Confirm that the Cloudflare deployment finishes successfully and that
    `/data/heating-oil-history.json` has a newer `metadata.syncedAt` value.
 
-The Cloudflare project must retain the build command above, Node.js 24, build
+The Cloudflare project must retain the build command above, Node.js 26 LTS, build
 output directory `build`, and `PUBLIC_URL=/`. These were configured when the
 Git-connected project was created. See [Cloudflare's deploy hook documentation](https://developers.cloudflare.com/pages/configuration/deploy-hooks/).
 
