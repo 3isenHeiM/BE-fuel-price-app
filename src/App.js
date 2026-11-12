@@ -161,11 +161,18 @@ function App() {
 
             <div className="hero-meta">
               {metadata?.lastPublishedAt ? (
-                <span className="badge">
+                <a
+                  className="badge badge-source"
+                  href="https://economie.fgov.be/fr/themes/energie/prix-de-lenergie/prix-maximum-des-produits/tarif-officiel-des-produits"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={messages.hero.officialSource}
+                >
                   {formatMessage(messages.hero.latestPublication, {
                     date: formatDate(metadata.lastPublishedAt),
                   })}
-                </span>
+                  <span aria-hidden="true">↗</span>
+                </a>
               ) : null}
             </div>
 
