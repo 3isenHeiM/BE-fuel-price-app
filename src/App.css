@@ -144,6 +144,21 @@
   font-weight: 600;
 }
 
+.badge-source {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.badge-source:hover {
+  color: var(--teal-deep);
+  border-color: var(--teal);
+}
+
+.badge-source:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
 .badge-live {
   color: #fff;
   background: linear-gradient(135deg, var(--teal) 0%, #115e59 100%);

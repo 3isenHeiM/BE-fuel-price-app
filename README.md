@@ -37,8 +37,8 @@ This ensures users always have access to price information, even during API outa
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm (v6 or higher)
+- Node.js 26 LTS (the version selected in `.node-version`)
+- npm
 - Internet connection (for fetching official data)
 
 ### Setup
@@ -71,9 +71,61 @@ npm run build
 
 The optimized production files will be created in the `build` folder.
 
+## 🌐 Cloudflare Pages Deployment (Free)
+
+Git-connected site: [be-fuel-price-app-github.pages.dev](https://be-fuel-price-app-github.pages.dev/).
+
+The app runs as a static Cloudflare Pages site. It serves the React build and
+the heating-oil JSON dataset without a paid Worker, database, or server.
+Cloudflare supplies HTTPS and a `pages.dev` address; a custom domain is optional.
+See [Cloudflare Pages Free plan limits](https://developers.cloudflare.com/pages/platform/limits/).
+
+### GitHub-backed deployments
+
+Cloudflare Pages connects directly to
+[`3isenHeiM/BE-fuel-price-app`](https://github.com/3isenHeiM/BE-fuel-price-app).
+Cloudflare clones the repository, installs dependencies, runs the tests,
+refreshes the price dataset, and builds and publishes the site. Your computer
+does not need to be running. No Cloudflare credentials are needed in GitHub
+Actions secrets for these native deployments.
+
+| Cloudflare setting | Value |
+| --- | --- |
+| Project | `be-fuel-price-app-github` |
+| Production branch | `main` |
+| Build command | `npm test -- --watchAll=false --runInBand && npm run sync:history && npm run build` |
+| Build output directory | `build` |
+| Root directory | Repository root |
+| `NODE_VERSION` | `26` |
+| `PUBLIC_URL` | `/` |
+
+Push changes to `main` to trigger a production deployment. Other branches get
+preview deployments. Build status and logs are available in the Cloudflare
+project's **Deployments** tab. The tracked [`wrangler.jsonc`](./wrangler.jsonc)
+uses the same project name and output directory.
+
+The root [`.node-version`](./.node-version) selects Node.js 26 LTS for local
+version managers and GitHub Actions. Keep Cloudflare's `NODE_VERSION` override
+at `26` for both production and preview builds so it matches the repository.
+
+The original [Direct Upload site](https://be-fuel-price-app.pages.dev/) remains
+available as the earlier deployment. Cloudflare does not support converting a
+Direct Upload project to Git integration, so the repository-backed project has
+a new address.
+
+Price data refreshes on every Cloudflare build. The
+[daily Cloudflare refresh workflow](./.github/workflows/refresh-cloudflare.yml)
+requests a production rebuild at **12:15 UTC** without code changes. It reads
+the deploy-hook URL from the `CLOUDFLARE_DEPLOY_HOOK` GitHub repository secret
+and must be merged into `main` for the schedule to run. See the
+[setup and verification guide](./docs/cloudflare-daily-refresh.md) for the
+one-time hook configuration and manual test. Your computer can stay off.
+The existing GitHub Pages workflow below refreshes its own deployment,
+independently of Cloudflare.
+
 ## 🌐 GitHub Pages Deployment
 
-This project is configured for GitHub Pages at:
+The existing GitHub Pages workflow is also available at:
 
 `https://3isenHeiM.github.io/BE-fuel-price-app`
 

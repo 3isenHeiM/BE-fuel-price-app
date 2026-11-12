@@ -1,0 +1,33 @@
+name: Refresh Cloudflare Prices Daily
+
+on:
+  schedule:
+    - cron: '15 12 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: cloudflare-daily-price-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Trigger Cloudflare production build
+        env:
+          CLOUDFLARE_DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
+        shell: bash
+        run: |
+          if [ -z "$CLOUDFLARE_DEPLOY_HOOK" ]; then
+            echo '::error::Set the CLOUDFLARE_DEPLOY_HOOK repository secret. See docs/cloudflare-daily-refresh.md.'
+            exit 1
+          fi
+
+          curl --fail --silent --show-error \
+            --connect-timeout 15 --max-time 60 \
+            --request POST --output /dev/null --proto '=https' \
+            --url "$CLOUDFLARE_DEPLOY_HOOK"
